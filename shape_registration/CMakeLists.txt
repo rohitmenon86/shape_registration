@@ -39,8 +39,8 @@ endif()
 find_path(QWT_INCLUDE_DIR qwt.h HINTS /usr/include/qwt /usr/local/lib/qwt)
     
 # VTK
-find_package(VTK REQUIRED)
-include(${VTK_USE_FILE})
+#find_package(VTK REQUIRED)
+#include(${VTK_USE_FILE})
 
 # PCL
 find_package(PCL COMPONENTS common visualization REQUIRED)
@@ -49,7 +49,7 @@ find_package(PCL COMPONENTS common visualization REQUIRED)
 find_package(Ceres REQUIRED)
 
 #Set compiler settings
-set(CMAKE_CXX_FLAGS "-std=c++11 -Wall ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++17 -Wall ${CMAKE_CXX_FLAGS}")
 set(CMAKE_BUILD_TYPE "Release")
 set(CMAKE_AUTORCC ON) # Resource files
     
@@ -105,7 +105,7 @@ add_library(shape_registration
     src/cloud_manager.cpp 
     src/shape_registration.cpp 
     src/shape_utils.cpp 
-    src/mesh_manager.cpp
+    #src/mesh_manager.cpp
     src/solver_thread.cpp
     src/solver.cpp
     ${MOC_SRCS}
@@ -114,7 +114,7 @@ add_library(shape_registration
 target_link_libraries(shape_registration
     learning_pca
     ${catkin_LIBRARIES}
-    ${VTK_LIBRARIES}
+    #${VTK_LIBRARIES}
     ${PCL_LIBRARIES}
     ${QT_LIBRARIES}
     ${CERES_LIBRARIES}

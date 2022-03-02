@@ -79,22 +79,22 @@ PointCloudT::Ptr categorical_registration::matrixToCloud(MatrixXd mat,
 }
 
 
-MatrixXd categorical_registration::meshToMatrix(vtkSmartPointer<vtkPolyData> mesh)
-{
-	MatrixXd Mat(mesh->GetNumberOfPoints(), 3);
+// MatrixXd categorical_registration::meshToMatrix(vtkSmartPointer<vtkPolyData> mesh)
+// {
+// 	MatrixXd Mat(mesh->GetNumberOfPoints(), 3);
 
-	for (vtkIdType i = 0; i < mesh->GetNumberOfPoints(); i++)
-	{
-		double p[3];
-		mesh->GetPoint(i, p);
+// 	for (vtkIdType i = 0; i < mesh->GetNumberOfPoints(); i++)
+// 	{
+// 		double p[3];
+// 		mesh->GetPoint(i, p);
 
-		Mat(i, 0) = p[0];
-		Mat(i, 1) = p[1];
-		Mat(i, 2) = p[2];
-	}
+// 		Mat(i, 0) = p[0];
+// 		Mat(i, 1) = p[1];
+// 		Mat(i, 2) = p[2];
+// 	}
 
-	return Mat;
-}
+// 	return Mat;
+// }
 
 
 PointCloudT::Ptr categorical_registration::transformCloud(PointCloudT::Ptr cloud_in, Eigen::Affine3d transform)
@@ -110,180 +110,180 @@ PointCloudT::Ptr categorical_registration::transformCloud(PointCloudT::Ptr cloud
 
 //Mesh related Methods------------------------------------------------------------------------
 
-vtkSmartPointer<vtkPolyData> categorical_registration::colorMesh(vtkSmartPointer<vtkPolyData> mesh, 
-																 const unsigned int &r , 
-																 const unsigned int &g, 
-																 const unsigned int &b)
-{
-	// Setup colors
-	unsigned char color[3] = {(unsigned char)r, (unsigned char)g, (unsigned char)b};
+// vtkSmartPointer<vtkPolyData> categorical_registration::colorMesh(vtkSmartPointer<vtkPolyData> mesh, 
+// 																 const unsigned int &r , 
+// 																 const unsigned int &g, 
+// 																 const unsigned int &b)
+// {
+// 	// Setup colors
+// 	unsigned char color[3] = {(unsigned char)r, (unsigned char)g, (unsigned char)b};
 
-	vtkSmartPointer<vtkUnsignedCharArray> colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
-	colors->SetNumberOfComponents(3);
-	colors->SetName ("Colors");
+// 	vtkSmartPointer<vtkUnsignedCharArray> colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
+// 	colors->SetNumberOfComponents(3);
+// 	colors->SetName ("Colors");
 
-	for (int i = 0; i < mesh->GetPoints()->GetNumberOfPoints(); i++)
-	{
-		colors->InsertNextTupleValue(color);
-	}
+// 	for (int i = 0; i < mesh->GetPoints()->GetNumberOfPoints(); i++)
+// 	{
+// 		colors->InsertNextTupleValue(color);
+// 	}
 
-	mesh->GetPointData()->SetScalars(colors);
-	return mesh;
-}
-
-
-// A method to build a "mesh" out of Points from a matrix. It is basically just a point cloud, because topology is missing
-vtkSmartPointer<vtkPolyData> categorical_registration::matrixToMesh(MatrixXd mat, 
-																	const unsigned int &r , 
-																	const unsigned int &g, 
-																	const unsigned int &b)
-{
-	vtkSmartPointer<vtkPolyData> mesh = vtkSmartPointer<vtkPolyData>::New();
-	vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-	vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
-
-	vtkIdType pid[1];
-
-	for (unsigned int i = 0; i < mat.rows(); i++)
-	{
-		double px = mat.row(i)[0];
-		double py = mat.row(i)[1];
-		double pz = mat.row(i)[2];
-
-		pid[0] = points->InsertNextPoint(px, py, pz);
-		vertices->InsertNextCell(1, pid);
-	}
-
-	// Set the points and vertices we created as the geometry and topology of the polydata
-	mesh->SetPoints(points);
-	mesh->SetVerts(vertices);
-	mesh = colorMesh(mesh, r, g, b);
-
-	return mesh;
-}
+// 	mesh->GetPointData()->SetScalars(colors);
+// 	return mesh;
+// }
 
 
-// A method to regain a mesh out of the (changed) point coordinates, when the topology of the mesh has not changed
-vtkSmartPointer<vtkPolyData> categorical_registration::matrixToMesh(MatrixXd mat,
-																	vtkSmartPointer<vtkPolyData> meshTop, 
-																	const unsigned int &r, 
-																	const unsigned int &g, 
-																	const unsigned int &b)
-{
-	vtkSmartPointer<vtkPolyData> mesh = vtkSmartPointer<vtkPolyData>::New();
-	vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-	vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
+// // A method to build a "mesh" out of Points from a matrix. It is basically just a point cloud, because topology is missing
+// vtkSmartPointer<vtkPolyData> categorical_registration::matrixToMesh(MatrixXd mat, 
+// 																	const unsigned int &r , 
+// 																	const unsigned int &g, 
+// 																	const unsigned int &b)
+// {
+// 	vtkSmartPointer<vtkPolyData> mesh = vtkSmartPointer<vtkPolyData>::New();
+// 	vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+// 	vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
 
-	vtkCellArray* polys = vtkCellArray::New();
-	polys = meshTop->GetPolys();
+// 	vtkIdType pid[1];
 
-	vtkIdType pid[1];
+// 	for (unsigned int i = 0; i < mat.rows(); i++)
+// 	{
+// 		double px = mat.row(i)[0];
+// 		double py = mat.row(i)[1];
+// 		double pz = mat.row(i)[2];
 
-	for (unsigned int i = 0; i < mat.rows(); i++)
-	{
-		double px = mat.row(i)[0];
-		double py = mat.row(i)[1];
-		double pz = mat.row(i)[2];
+// 		pid[0] = points->InsertNextPoint(px, py, pz);
+// 		vertices->InsertNextCell(1, pid);
+// 	}
 
-		pid[0] = points->InsertNextPoint(px, py, pz);
-		vertices->InsertNextCell(1, pid);
+// 	// Set the points and vertices we created as the geometry and topology of the polydata
+// 	mesh->SetPoints(points);
+// 	mesh->SetVerts(vertices);
+// 	mesh = colorMesh(mesh, r, g, b);
 
-	}
-
-	// Set the points and vertices we created as the geometry and topology of the polydata
-	mesh->SetPoints(points);
-	mesh->SetVerts(vertices);
-	mesh->SetPolys(polys);
-	mesh = colorMesh(mesh, r, g, b);
-
-	return mesh;
-}
+// 	return mesh;
+// }
 
 
-// Subsample with quadric decimation algo
-vtkSmartPointer<vtkPolyData> categorical_registration::quadricClustering(vtkSmartPointer<vtkPolyData> mesh, double factor)
-{
-	ROS_DEBUG_STREAM( "Before decimation \n ------------" );
-	ROS_DEBUG_STREAM( "There are " << mesh->GetNumberOfPoints() << " points." );
-	ROS_DEBUG_STREAM( "There are " << mesh->GetNumberOfPolys() << " polygons." );
+// // A method to regain a mesh out of the (changed) point coordinates, when the topology of the mesh has not changed
+// vtkSmartPointer<vtkPolyData> categorical_registration::matrixToMesh(MatrixXd mat,
+// 																	vtkSmartPointer<vtkPolyData> meshTop, 
+// 																	const unsigned int &r, 
+// 																	const unsigned int &g, 
+// 																	const unsigned int &b)
+// {
+// 	vtkSmartPointer<vtkPolyData> mesh = vtkSmartPointer<vtkPolyData>::New();
+// 	vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+// 	vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
 
-	vtkSmartPointer<vtkQuadricClustering> decimate = vtkSmartPointer<vtkQuadricClustering>::New();
+// 	vtkCellArray* polys = vtkCellArray::New();
+// 	polys = meshTop->GetPolys();
 
-	decimate->SetNumberOfXDivisions(factor);
-	decimate->SetNumberOfYDivisions(factor);
-	decimate->SetNumberOfZDivisions(factor);
-	decimate->SetInputData(mesh);
-	decimate->Update();
+// 	vtkIdType pid[1];
 
-	vtkSmartPointer<vtkPolyData> decimated = vtkSmartPointer<vtkPolyData>::New();
-	decimated->ShallowCopy(decimate->GetOutput());
+// 	for (unsigned int i = 0; i < mat.rows(); i++)
+// 	{
+// 		double px = mat.row(i)[0];
+// 		double py = mat.row(i)[1];
+// 		double pz = mat.row(i)[2];
 
-	ROS_DEBUG_STREAM( "After decimation \n ------------" );
-	ROS_DEBUG_STREAM( "There are " << decimated->GetNumberOfPoints() << " points." );
-	ROS_DEBUG_STREAM( "There are " << decimated->GetNumberOfPolys() << " polygons." );
+// 		pid[0] = points->InsertNextPoint(px, py, pz);
+// 		vertices->InsertNextCell(1, pid);
 
-	return decimated;
-}
+// 	}
 
+// 	// Set the points and vertices we created as the geometry and topology of the polydata
+// 	mesh->SetPoints(points);
+// 	mesh->SetVerts(vertices);
+// 	mesh->SetPolys(polys);
+// 	mesh = colorMesh(mesh, r, g, b);
 
-// Higher the resolution to fill get rid of big faces
-vtkSmartPointer<vtkPolyData> categorical_registration::resolution(vtkSmartPointer<vtkPolyData> mesh, double factor)
-{
-	ROS_DEBUG_STREAM( "Before subdivision \n ------------" );
-	ROS_DEBUG_STREAM( "There are " << mesh->GetNumberOfPoints() << " points." );
-	ROS_DEBUG_STREAM( "There are " << mesh->GetNumberOfPolys() << " polygons." );
-
-	// Triangulate at first
-	vtkSmartPointer<vtkTriangleFilter> triangleFilter = vtkSmartPointer<vtkTriangleFilter>::New();
-	triangleFilter->SetInputData(mesh);
-	triangleFilter->Update();
-
-	vtkSmartPointer<vtkPolyData> upSampled = vtkSmartPointer<vtkPolyData>::New();
-	upSampled->DeepCopy(triangleFilter->GetOutput());
-
-	vtkSmartPointer<vtkPolyDataAlgorithm> subdivisionFilter;
-	subdivisionFilter = vtkSmartPointer<vtkLoopSubdivisionFilter>::New();
-	dynamic_cast<vtkLoopSubdivisionFilter *> (subdivisionFilter.GetPointer())->SetNumberOfSubdivisions(factor);
-
-	subdivisionFilter->SetInputData(upSampled);
-	subdivisionFilter->Update();
-
-	if (subdivisionFilter->GetOutput()->GetNumberOfPoints() == 0)
-	{
-		subdivisionFilter = vtkSmartPointer<vtkLinearSubdivisionFilter>::New();
-		dynamic_cast<vtkLinearSubdivisionFilter *> (subdivisionFilter.GetPointer())->SetNumberOfSubdivisions(factor);
-		subdivisionFilter->SetInputData(upSampled);
-		subdivisionFilter->Update();
-	}
-
-	upSampled->ShallowCopy(subdivisionFilter->GetOutput());
-
-	ROS_DEBUG_STREAM( "After subdivision \n ------------" );
-	ROS_DEBUG_STREAM( "There are " << upSampled->GetNumberOfPoints() << " points." );
-	ROS_DEBUG_STREAM( "There are " << upSampled->GetNumberOfPolys() << " polygons." );
-
-	return upSampled;
-}
+// 	return mesh;
+// }
 
 
-// remove intrinsic geometry (to be finished)
-vtkSmartPointer<vtkPolyData> categorical_registration::extractOutside(vtkSmartPointer<vtkPolyData> mesh)
-{
-	ROS_DEBUG_STREAM( "Before extraction \n ------------" );
-	ROS_DEBUG_STREAM( "There are " << mesh->GetNumberOfPoints() << " points." );
-	ROS_DEBUG_STREAM( "There are " << mesh->GetNumberOfPolys() << " polygons." );
+// // Subsample with quadric decimation algo
+// vtkSmartPointer<vtkPolyData> categorical_registration::quadricClustering(vtkSmartPointer<vtkPolyData> mesh, double factor)
+// {
+// 	ROS_DEBUG_STREAM( "Before decimation \n ------------" );
+// 	ROS_DEBUG_STREAM( "There are " << mesh->GetNumberOfPoints() << " points." );
+// 	ROS_DEBUG_STREAM( "There are " << mesh->GetNumberOfPolys() << " polygons." );
 
-	vtkSmartPointer<vtkDataSetSurfaceFilter> decimate = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+// 	vtkSmartPointer<vtkQuadricClustering> decimate = vtkSmartPointer<vtkQuadricClustering>::New();
 
-	decimate->SetInputData(mesh);
-	decimate->Update();
+// 	decimate->SetNumberOfXDivisions(factor);
+// 	decimate->SetNumberOfYDivisions(factor);
+// 	decimate->SetNumberOfZDivisions(factor);
+// 	decimate->SetInputData(mesh);
+// 	decimate->Update();
 
-	vtkSmartPointer<vtkPolyData> decimated = vtkSmartPointer<vtkPolyData>::New();
-	decimated->ShallowCopy(decimate->GetOutput());
+// 	vtkSmartPointer<vtkPolyData> decimated = vtkSmartPointer<vtkPolyData>::New();
+// 	decimated->ShallowCopy(decimate->GetOutput());
 
-	ROS_DEBUG_STREAM( "After extraction \n ------------" );
-	ROS_DEBUG_STREAM( "There are " << decimated->GetNumberOfPoints() << " points." );
-	ROS_DEBUG_STREAM( "There are " << decimated->GetNumberOfPolys() << " polygons." );
+// 	ROS_DEBUG_STREAM( "After decimation \n ------------" );
+// 	ROS_DEBUG_STREAM( "There are " << decimated->GetNumberOfPoints() << " points." );
+// 	ROS_DEBUG_STREAM( "There are " << decimated->GetNumberOfPolys() << " polygons." );
 
-	return decimated;
-}
+// 	return decimated;
+// }
+
+
+// // Higher the resolution to fill get rid of big faces
+// vtkSmartPointer<vtkPolyData> categorical_registration::resolution(vtkSmartPointer<vtkPolyData> mesh, double factor)
+// {
+// 	ROS_DEBUG_STREAM( "Before subdivision \n ------------" );
+// 	ROS_DEBUG_STREAM( "There are " << mesh->GetNumberOfPoints() << " points." );
+// 	ROS_DEBUG_STREAM( "There are " << mesh->GetNumberOfPolys() << " polygons." );
+
+// 	// Triangulate at first
+// 	vtkSmartPointer<vtkTriangleFilter> triangleFilter = vtkSmartPointer<vtkTriangleFilter>::New();
+// 	triangleFilter->SetInputData(mesh);
+// 	triangleFilter->Update();
+
+// 	vtkSmartPointer<vtkPolyData> upSampled = vtkSmartPointer<vtkPolyData>::New();
+// 	upSampled->DeepCopy(triangleFilter->GetOutput());
+
+// 	vtkSmartPointer<vtkPolyDataAlgorithm> subdivisionFilter;
+// 	subdivisionFilter = vtkSmartPointer<vtkLoopSubdivisionFilter>::New();
+// 	dynamic_cast<vtkLoopSubdivisionFilter *> (subdivisionFilter.GetPointer())->SetNumberOfSubdivisions(factor);
+
+// 	subdivisionFilter->SetInputData(upSampled);
+// 	subdivisionFilter->Update();
+
+// 	if (subdivisionFilter->GetOutput()->GetNumberOfPoints() == 0)
+// 	{
+// 		subdivisionFilter = vtkSmartPointer<vtkLinearSubdivisionFilter>::New();
+// 		dynamic_cast<vtkLinearSubdivisionFilter *> (subdivisionFilter.GetPointer())->SetNumberOfSubdivisions(factor);
+// 		subdivisionFilter->SetInputData(upSampled);
+// 		subdivisionFilter->Update();
+// 	}
+
+// 	upSampled->ShallowCopy(subdivisionFilter->GetOutput());
+
+// 	ROS_DEBUG_STREAM( "After subdivision \n ------------" );
+// 	ROS_DEBUG_STREAM( "There are " << upSampled->GetNumberOfPoints() << " points." );
+// 	ROS_DEBUG_STREAM( "There are " << upSampled->GetNumberOfPolys() << " polygons." );
+
+// 	return upSampled;
+// }
+
+
+// // remove intrinsic geometry (to be finished)
+// vtkSmartPointer<vtkPolyData> categorical_registration::extractOutside(vtkSmartPointer<vtkPolyData> mesh)
+// {
+// 	ROS_DEBUG_STREAM( "Before extraction \n ------------" );
+// 	ROS_DEBUG_STREAM( "There are " << mesh->GetNumberOfPoints() << " points." );
+// 	ROS_DEBUG_STREAM( "There are " << mesh->GetNumberOfPolys() << " polygons." );
+
+// 	vtkSmartPointer<vtkDataSetSurfaceFilter> decimate = vtkSmartPointer<vtkDataSetSurfaceFilter>::New();
+
+// 	decimate->SetInputData(mesh);
+// 	decimate->Update();
+
+// 	vtkSmartPointer<vtkPolyData> decimated = vtkSmartPointer<vtkPolyData>::New();
+// 	decimated->ShallowCopy(decimate->GetOutput());
+
+// 	ROS_DEBUG_STREAM( "After extraction \n ------------" );
+// 	ROS_DEBUG_STREAM( "There are " << decimated->GetNumberOfPoints() << " points." );
+// 	ROS_DEBUG_STREAM( "There are " << decimated->GetNumberOfPolys() << " polygons." );
+
+// 	return decimated;
+// }

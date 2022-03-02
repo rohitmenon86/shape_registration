@@ -12,7 +12,7 @@
 #include <pcl/io/vtk_lib_io.h>
 
 // Visualization Toolkit (VTK)
-#include <vtkRenderWindow.h>
+// #include <vtkRenderWindow.h>
 
 #include <shape_registration/cloud_manager.hpp>
 #include <shape_registration/mesh_manager.hpp>
@@ -48,22 +48,22 @@ public:
 	void updateCloudsTesting();
 
 	// Meshes
-	void init(MeshManager* meshes);
-	void setUpMeshes();
-	void initTraMesh();
-	void initObsMesh();
-	void removeMeshes();
-	void removeTraMesh();
-	void removeObsMesh();
+	// void init(MeshManager* meshes);
+	// void setUpMeshes();
+	// void initTraMesh();
+	// void initObsMesh();
+	// void removeMeshes();
+	// void removeTraMesh();
+	// void removeObsMesh();
 
-	void updateMeshes();
-	void updateTraMesh();
-	void updateObsMesh();
+	// void updateMeshes();
+	// void updateTraMesh();
+	// void updateObsMesh();
 
-	// Clouds visualization methods for the testing frame
-	void initMeshesTesting();
-	void removeMeshesTesting();
-	void updateMeshesTesting();
+	// // Clouds visualization methods for the testing frame
+	// void initMeshesTesting();
+	// void removeMeshesTesting();
+	// void updateMeshesTesting();
 
 	void showCanonical(bool b)
 	{ m_show_canonical = b; };
@@ -84,7 +84,7 @@ private:
 	boost::shared_ptr<pcl::visualization::PCLVisualizer> m_viewer;
 
 	CloudManager* m_cloudData;
-	MeshManager* m_meshData;
+	//MeshManager* m_meshData;
 
 	bool m_show_canonical = true;
 	bool m_show_observed = true;

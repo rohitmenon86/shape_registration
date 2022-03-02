@@ -147,108 +147,108 @@ void PCLViewer::updateCloudsTesting()
 
 //-----------------------------------Mesh mesthods-------------------------------------
 
-void PCLViewer::init(MeshManager* meshes)
-{
-	m_meshData = meshes;
-}
+// void PCLViewer::init(MeshManager* meshes)
+// {
+// 	m_meshData = meshes;
+// }
 
 
-void PCLViewer::setUpMeshes()
-{
-	initObsMesh();
-	initTraMesh();
-}
+// void PCLViewer::setUpMeshes()
+// {
+// 	initObsMesh();
+// 	initTraMesh();
+// }
 
 
-void PCLViewer::initTraMesh()
-{
-	if (m_show_deformed && m_meshData->getCanonicalIdx() > -1)
-		m_viewer->addModelFromPolyData (m_meshData->getCurrentTransformed(), "transformed_mesh");
-	else
-		ROS_INFO("The transformed mesh has not been defined.");
-}
+// void PCLViewer::initTraMesh()
+// {
+// 	if (m_show_deformed && m_meshData->getCanonicalIdx() > -1)
+// 		m_viewer->addModelFromPolyData (m_meshData->getCurrentTransformed(), "transformed_mesh");
+// 	else
+// 		ROS_INFO("The transformed mesh has not been defined.");
+// }
 
 
-void PCLViewer::initObsMesh()
-{
-	if (m_show_observed)
-		m_viewer->addModelFromPolyData (m_meshData->getCurrentObserved(), "observed_mesh");
-}
+// void PCLViewer::initObsMesh()
+// {
+// 	if (m_show_observed)
+// 		m_viewer->addModelFromPolyData (m_meshData->getCurrentObserved(), "observed_mesh");
+// }
 
-// Remove the meshes
-void PCLViewer::removeMeshes()
-{
-	removeObsMesh();
-	removeTraMesh();
-}
-
-
-void PCLViewer::removeTraMesh()
-{
-	m_viewer->removeShape("transformed_mesh");
-}
+// // Remove the meshes
+// void PCLViewer::removeMeshes()
+// {
+// 	removeObsMesh();
+// 	removeTraMesh();
+// }
 
 
-void PCLViewer::removeObsMesh()
-{
-	m_viewer->removeShape("observed_mesh");
-}
+// void PCLViewer::removeTraMesh()
+// {
+// 	m_viewer->removeShape("transformed_mesh");
+// }
 
 
-// Update the meshes
-void PCLViewer::updateMeshes()
-{
-	updateObsMesh();
-	updateTraMesh();
-}
+// void PCLViewer::removeObsMesh()
+// {
+// 	m_viewer->removeShape("observed_mesh");
+// }
 
 
-// Update the transformed mesh
-void PCLViewer::updateTraMesh()
-{
-	removeTraMesh();
-	initTraMesh();
-}
+// // Update the meshes
+// void PCLViewer::updateMeshes()
+// {
+// 	updateObsMesh();
+// 	updateTraMesh();
+// }
 
 
-// Update the observed mesh
-void PCLViewer::updateObsMesh()
-{
-	removeObsMesh();
-	initObsMesh();
-}
+// // Update the transformed mesh
+// void PCLViewer::updateTraMesh()
+// {
+// 	removeTraMesh();
+// 	initTraMesh();
+// }
 
 
-// Init the mesh visualization for the testing frame
-void PCLViewer::initMeshesTesting()
-{
-	if (m_show_deformed)
-		m_viewer->addModelFromPolyData (m_meshData->m_transformedPCAMesh, "pca_mesh");
-
-	if (m_show_canonical)
-	{
-		colorMesh(m_meshData->getCanonical(), 255, 0, 0);
-		m_viewer->addModelFromPolyData (m_meshData->getCanonical(), "canonical_mesh");
-	}
-}
+// // Update the observed mesh
+// void PCLViewer::updateObsMesh()
+// {
+// 	removeObsMesh();
+// 	initObsMesh();
+// }
 
 
-// Remove the visualization from the testing frame
-void PCLViewer::removeMeshesTesting()
-{
-	m_viewer->removeShape("canonical_mesh");
-	m_viewer->removeShape("pca_mesh");
-}
+// // Init the mesh visualization for the testing frame
+// void PCLViewer::initMeshesTesting()
+// {
+// 	if (m_show_deformed)
+// 		m_viewer->addModelFromPolyData (m_meshData->m_transformedPCAMesh, "pca_mesh");
+
+// 	if (m_show_canonical)
+// 	{
+// 		colorMesh(m_meshData->getCanonical(), 255, 0, 0);
+// 		m_viewer->addModelFromPolyData (m_meshData->getCanonical(), "canonical_mesh");
+// 	}
+// }
 
 
-// Update the visualization for the testing frame
-void PCLViewer::updateMeshesTesting()
-{
-	m_viewer->removeShape("pca_mesh");
+// // Remove the visualization from the testing frame
+// void PCLViewer::removeMeshesTesting()
+// {
+// 	m_viewer->removeShape("canonical_mesh");
+// 	m_viewer->removeShape("pca_mesh");
+// }
 
-	if (m_show_deformed)
-	{
-		colorMesh(m_meshData->m_transformedPCAMesh, 0, 0, 255);
-		m_viewer->addModelFromPolyData (m_meshData->m_transformedPCAMesh, "pca_mesh");
-	}
-}
+
+// // Update the visualization for the testing frame
+// void PCLViewer::updateMeshesTesting()
+// {
+// 	m_viewer->removeShape("pca_mesh");
+
+// 	if (m_show_deformed)
+// 	{
+// 		colorMesh(m_meshData->m_transformedPCAMesh, 0, 0, 255);
+// 		m_viewer->addModelFromPolyData (m_meshData->m_transformedPCAMesh, "pca_mesh");
+// 	}
+// }

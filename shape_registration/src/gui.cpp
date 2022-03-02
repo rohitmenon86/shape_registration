@@ -572,8 +572,9 @@ void ShapeGui::frameChangePushed(int frame)
 
 		if (ui->meshButton->isChecked() )
 		{
-			m_shape_reg->viewer()->removeMeshesTesting();
-			m_shape_reg->viewer()->updateMeshes();
+			// m_shape_reg->viewer()->removeMeshesTesting();
+			// m_shape_reg->viewer()->updateMeshes();
+			ROS_WARN("Mesh fucntionality disabled");
 		}
 		else
 		{
@@ -594,8 +595,9 @@ void ShapeGui::frameChangePushed(int frame)
 
 		if (ui->meshButton->isChecked() )
 		{
-			m_shape_reg->viewer()->removeMeshes();
-			m_shape_reg->viewer()->updateMeshesTesting();
+			// m_shape_reg->viewer()->removeMeshes();
+			// m_shape_reg->viewer()->updateMeshesTesting();
+			ROS_WARN("Mesh fucntionality disabled");
 		}
 		else
 		{

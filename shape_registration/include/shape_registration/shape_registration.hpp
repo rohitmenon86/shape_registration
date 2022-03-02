@@ -5,7 +5,7 @@
 #pragma once
 
 #include <shape_registration/cloud_manager.hpp>
-#include <shape_registration/mesh_manager.hpp>
+//#include <shape_registration/mesh_manager.hpp>
 #include <shape_registration/pclviewer.h>
 #include <shape_registration/shape_registration.hpp>
 #include <shape_registration/cpd.hpp>
@@ -41,30 +41,39 @@ public:
 	void addTestingObserved(const std::string filepath);
 	void setTestingObserved(PointCloudT::Ptr cloud);
 
-	void setCanonicalMeshIdx(int idx);
+	void setCanonicalMeshIdx(int idx)
+	{
+		ROS_WARN("Mesh functionality disabled");
+	}
 	void setCanonicalPCDIdx(int idx);
 
 	int getCanonicalMeshIdx() const
-	{ return m_meshData.getCanonicalIdx(); };
+	{ return m_cloudData.getCanonicalIdx(); };
 
 	int getCanonicalPCDIdx() const
 	{ return m_cloudData.getCanonicalIdx(); };
 
 	int getMeshCount()
-	{ return m_meshData.getNumberInstances(); };
+	{ return m_cloudData.getNumberInstances(); };
 
 	int getCloudCount()
 	{ return m_cloudData.getNumberInstances(); };
 
-	void setObservedMeshIdx(int idx);
+	void setObservedMeshIdx(int idx)
+	{
+		ROS_WARN("Mesh functionality disabled");
+	}
 	void setObservedPCDIdx(int idx);
 
 	int getObservedMeshIdx()
-	{ return m_meshData.getCurrentObservedIdx(); };
+	{ return m_cloudData.getCurrentObservedIdx(); };
 	int getObservedPCDIdx()
 	{ return m_cloudData.getCurrentObservedIdx(); };
 
-	void deleteMesh(const int idx);
+	void deleteMesh(const int idx)
+	{
+		ROS_WARN("Mesh functionality disabled");
+	}
 	void deletePCD(const int idx);
 
 	void updateViewer();
@@ -86,19 +95,19 @@ public:
 
 	void setUsingMeshes(bool b)
 	{
-		m_using_meshes = b;
+		m_using_meshes = false;
 
-		if (m_using_meshes && m_meshData.getNumberInstances() > 1)
-		{
-			m_viewer.removeClouds();
-			m_viewer.setUpMeshes();
-		}
+		// if (m_using_meshes && m_meshData.getNumberInstances() > 1)
+		// {
+		// 	m_viewer.removeClouds();
+		// 	m_viewer.setUpMeshes();
+		// }
 
-		if (!m_using_meshes && m_cloudData.getNumberInstances() > 1)
-		{
-			m_viewer.removeMeshes();
-			updateViewer();
-		}
+		// if (!m_using_meshes && m_cloudData.getNumberInstances() > 1)
+		// {
+		// 	m_viewer.removeMeshes();
+		// 	updateViewer();
+		// }
 	};
 
 	bool usingMeshes() const
@@ -108,7 +117,7 @@ public:
 	{ return m_CPD_done; };
 
 	bool cpdDoneOnMeshes()
-	{ return m_meshData.getCpdDone(); };
+	{ return m_cloudData.getCpdDone(); };
 
 	bool cpdDoneOnClouds()
 	{ return m_cloudData.getCpdDone(); };
@@ -171,7 +180,7 @@ private:
 	void buildBigW();
 	MatrixXd wFromClassW(int index, MatrixXd bigW);
 
-	MeshManager m_meshData;
+	//MeshManager m_meshData;
 	CloudManager m_cloudData;
 
 	PCLViewer m_viewer;

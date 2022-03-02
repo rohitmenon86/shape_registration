@@ -10,7 +10,7 @@ using namespace categorical_registration;
 
 ShapeRegistration::ShapeRegistration()
 {
-	m_viewer.init(&m_meshData);
+	//m_viewer.init(&m_meshData);
 	m_viewer.init(&m_cloudData);
 
 	m_mutex = new QReadWriteLock();
@@ -39,7 +39,7 @@ ShapeRegistration::~ShapeRegistration ()
 
 void ShapeRegistration::addTrainingInstance(const std::string filepath)
 {
-	if (filepath.substr(filepath.find_last_of(".") + 1) == "ply")
+	/*if (filepath.substr(filepath.find_last_of(".") + 1) == "ply")
 	// Meshes are loaded
 	{
 		vtkSmartPointer<vtkPolyData> tmp_mesh = vtkSmartPointer<vtkPolyData>::New();
@@ -56,7 +56,7 @@ void ShapeRegistration::addTrainingInstance(const std::string filepath)
 				m_viewer.updateMeshes();
 		}
 	}
-	else if (filepath.substr(filepath.find_last_of(".") + 1) == "pcd")
+	else*/ if (filepath.substr(filepath.find_last_of(".") + 1) == "pcd")
 	// Clouds are loaded
 	{
 		PointCloudT::Ptr tmp_cloud;
@@ -79,7 +79,7 @@ void ShapeRegistration::addTrainingInstance(const std::string filepath)
 
 void ShapeRegistration::addTestingObserved(const std::string filepath)
 {
-	if (filepath.substr(filepath.find_last_of(".") + 1) == "ply")
+	/*if (filepath.substr(filepath.find_last_of(".") + 1) == "ply")
 	// Meshes are loaded
 	{
 		vtkSmartPointer<vtkPolyData> tmp_mesh = vtkSmartPointer<vtkPolyData>::New();
@@ -90,7 +90,7 @@ void ShapeRegistration::addTestingObserved(const std::string filepath)
 
 		m_viewer.updateMeshesTesting();
 	}
-	else if (filepath.substr(filepath.find_last_of(".") + 1) == "pcd")
+	else*/ if (filepath.substr(filepath.find_last_of(".") + 1) == "pcd")
 	// Clouds are loaded
 	{
 		PointCloudT::Ptr tmp_cloud( new pcl::PointCloud<PointT> () );
@@ -111,11 +111,11 @@ void ShapeRegistration::setTestingObserved(PointCloudT::Ptr cloud)
 }
 
 
-void ShapeRegistration::setCanonicalMeshIdx(int idx)
-{
-	m_meshData.setCanonicalIdx(idx);
-	m_viewer.updateMeshes();
-}
+// void ShapeRegistration::setCanonicalMeshIdx(int idx)
+// {
+// 	m_meshData.setCanonicalIdx(idx);
+// 	m_viewer.updateMeshes();
+// }
 
 
 void ShapeRegistration::setCanonicalPCDIdx(int idx)
@@ -125,11 +125,11 @@ void ShapeRegistration::setCanonicalPCDIdx(int idx)
 }
 
 
-void ShapeRegistration::setObservedMeshIdx(int idx)
-{
-	m_meshData.setCurrentObservedIdx(idx);
-	m_viewer.updateMeshes();
-}
+// void ShapeRegistration::setObservedMeshIdx(int idx)
+// {
+// 	m_meshData.setCurrentObservedIdx(idx);
+// 	m_viewer.updateMeshes();
+// }
 
 
 void ShapeRegistration::setObservedPCDIdx(int idx)
@@ -139,11 +139,11 @@ void ShapeRegistration::setObservedPCDIdx(int idx)
 }
 
 
-void ShapeRegistration::deleteMesh(const int idx)
-{
-	m_meshData.deleteInstance(idx);
-	m_viewer.updateMeshes();
-}
+// void ShapeRegistration::deleteMesh(const int idx)
+// {
+// 	m_meshData.deleteInstance(idx);
+// 	m_viewer.updateMeshes();
+// }
 
 
 void ShapeRegistration::deletePCD(const int idx)
@@ -157,16 +157,16 @@ void ShapeRegistration::updateViewer()
 {
 	if (m_training_view)
 	{
-		if ( m_using_meshes)
-			m_viewer.updateMeshes();
-		else
+		// if ( m_using_meshes)
+		// 	m_viewer.updateMeshes();
+		//else
 			m_viewer.updateClouds();
 	}
 	else
 	{
-		if ( m_using_meshes)
-			m_viewer.updateMeshes();
-		else
+		// if ( m_using_meshes)
+		// 	m_viewer.updateMeshes();
+		// else
 			m_viewer.updateCloudsTesting();
 	}
 }
@@ -176,27 +176,27 @@ void ShapeRegistration::calculateDeformationFields()
 {
 	m_CPD_done = false;
 
-	if ( m_using_meshes)
-	{
-		if ( m_meshData.getNumberInstances() < 2)
-		{
-			ROS_INFO( "Please load at least 2 meshes before" );
-		}
-		else if ( m_meshData.getCpdDone() )
-		{
-			ROS_INFO( "CPD has been already calculated" );
-		}
-		else
-		{
-			for (int i = 0; i < (int) m_meshData.getNumberInstances(); i++)
-			{
-				cpd( m_meshData.getCanonicalIdx(), i);
-			}
+	// if ( m_using_meshes)
+	// {
+	// 	if ( m_meshData.getNumberInstances() < 2)
+	// 	{
+	// 		ROS_INFO( "Please load at least 2 meshes before" );
+	// 	}
+	// 	else if ( m_meshData.getCpdDone() )
+	// 	{
+	// 		ROS_INFO( "CPD has been already calculated" );
+	// 	}
+	// 	else
+	// 	{
+	// 		for (int i = 0; i < (int) m_meshData.getNumberInstances(); i++)
+	// 		{
+	// 			cpd( m_meshData.getCanonicalIdx(), i);
+	// 		}
 
-			m_viewer.updateMeshes();
-		}
-	}
-	else
+	// 		m_viewer.updateMeshes();
+	// 	}
+	// }
+	// else
 	{
 		if (m_cloudData.getNumberInstances() < 2)
 		{
@@ -223,11 +223,11 @@ void ShapeRegistration::calculateDeformationFields()
 
 void ShapeRegistration::cpd(int can_number, int obs_number)
 {
-	if (m_using_meshes)
-	{
-		cpdOnMeshes(can_number, obs_number);
-	}
-	else
+	// if (m_using_meshes)
+	// {
+	// 	cpdOnMeshes(can_number, obs_number);
+	// }
+	// else
 	{
 		cpdOnClouds(can_number, obs_number);
 	}
@@ -306,103 +306,103 @@ void ShapeRegistration::cpdOnClouds(int can_number, int obs_number)
 
 
 // Perform CPD on meshes
-void ShapeRegistration::cpdOnMeshes(int can_number, int obs_number)
-{
-	// Just to inform about the progress
-	int calculationNumber = obs_number + 1;
+// void ShapeRegistration::cpdOnMeshes(int can_number, int obs_number)
+// {
+// 	// Just to inform about the progress
+// 	int calculationNumber = obs_number + 1;
 
-	if (obs_number > can_number)
-	{
-		calculationNumber --;
-	}
+// 	if (obs_number > can_number)
+// 	{
+// 		calculationNumber --;
+// 	}
 
-	MatrixXd observed_mat;
-	MatrixXd canonical_mat;
-	MatrixXd erg_mat;
-	MatrixXd W;
-	cpdG::NonrigidResult result;
+// 	MatrixXd observed_mat;
+// 	MatrixXd canonical_mat;
+// 	MatrixXd erg_mat;
+// 	MatrixXd W;
+// 	cpdG::NonrigidResult result;
 
-	// Just calculate for the non canonical instances
-	if (can_number != obs_number)
-	{
-		ROS_INFO_STREAM( "Calculating number " << calculationNumber << " from " << m_meshData.getNumberInstances() - 1 );
+// 	// Just calculate for the non canonical instances
+// 	if (can_number != obs_number)
+// 	{
+// 		ROS_INFO_STREAM( "Calculating number " << calculationNumber << " from " << m_meshData.getNumberInstances() - 1 );
 
-		vtkSmartPointer<vtkPolyData> subObs = vtkSmartPointer<vtkPolyData>::New();
-		subObs->DeepCopy(m_meshData.getObservedAt(obs_number));
+// 		vtkSmartPointer<vtkPolyData> subObs = vtkSmartPointer<vtkPolyData>::New();
+// 		subObs->DeepCopy(m_meshData.getObservedAt(obs_number));
 
-		vtkSmartPointer<vtkPolyData> subCan = vtkSmartPointer<vtkPolyData>::New();
-		subCan->DeepCopy(m_meshData.getCanonical() );
+// 		vtkSmartPointer<vtkPolyData> subCan = vtkSmartPointer<vtkPolyData>::New();
+// 		subCan->DeepCopy(m_meshData.getCanonical() );
 
-		// Add points to the mesh to make it more dense
-		subObs = resolution(subObs, 1);
-		subCan = resolution(subCan, 1);
+// 		// Add points to the mesh to make it more dense
+// 		subObs = resolution(subObs, 1);
+// 		subCan = resolution(subCan, 1);
 
-		// Subsample the mesh for faster calculation
-		while (subObs->GetNumberOfPoints() > m_max_num_points_mesh)
-		{
-			subObs = quadricClustering(subObs, 32);
-		}
+// 		// Subsample the mesh for faster calculation
+// 		while (subObs->GetNumberOfPoints() > m_max_num_points_mesh)
+// 		{
+// 			subObs = quadricClustering(subObs, 32);
+// 		}
 
-		while (subCan->GetNumberOfPoints() > m_max_num_points_mesh)
-		{
-			subCan = quadricClustering(subCan, 32);
-		}
+// 		while (subCan->GetNumberOfPoints() > m_max_num_points_mesh)
+// 		{
+// 			subCan = quadricClustering(subCan, 32);
+// 		}
 
-		// Take the points of the mesh and store them in a matrix
-		observed_mat = meshToMatrix(subObs);
-		canonical_mat = meshToMatrix(subCan);
+// 		// Take the points of the mesh and store them in a matrix
+// 		observed_mat = meshToMatrix(subObs);
+// 		canonical_mat = meshToMatrix(subCan);
 
-		// Perform CPD
-		result = doCPD(observed_mat, canonical_mat,  m_config_beta,  m_config_lambda);
-		erg_mat = result.points;
-		W = result.getW();
+// 		// Perform CPD
+// 		result = doCPD(observed_mat, canonical_mat,  m_config_beta,  m_config_lambda);
+// 		erg_mat = result.points;
+// 		W = result.getW();
 
-		// Save the transformed mesh
-		m_meshData.setTransformedAt(obs_number, matrixToMesh(erg_mat, subCan));
+// 		// Save the transformed mesh
+// 		m_meshData.setTransformedAt(obs_number, matrixToMesh(erg_mat, subCan));
 
-		// Save the canonical matrix and G once
-		if ( !m_meshData.getCpdDone() )
-		{
-			m_meshData.setG(result.G);
-			m_meshData.m_canonicalMat = canonical_mat;
+// 		// Save the canonical matrix and G once
+// 		if ( !m_meshData.getCpdDone() )
+// 		{
+// 			m_meshData.setG(result.G);
+// 			m_meshData.m_canonicalMat = canonical_mat;
 
-			// Save an instance for visualizing PCA after the CPD
-			m_meshData.m_transformedPCAMesh = matrixToMesh(m_meshData.m_canonicalMat, m_meshData.getTransformedAt(obs_number), 0, 0 , 255);
-		}
+// 			// Save an instance for visualizing PCA after the CPD
+// 			m_meshData.m_transformedPCAMesh = matrixToMesh(m_meshData.m_canonicalMat, m_meshData.getTransformedAt(obs_number), 0, 0 , 255);
+// 		}
 
-		m_meshData.setCpdDone(true);
+// 		m_meshData.setCpdDone(true);
 
-		ROS_INFO_STREAM( "\nCalculation " << calculationNumber << " from " << m_meshData.getNumberInstances() - 1 << " is done." );
-	}
-	else
-	{
-		// Save some W to make the numbering consistent
-		W = MatrixXd::Zero(1, 1);
+// 		ROS_INFO_STREAM( "\nCalculation " << calculationNumber << " from " << m_meshData.getNumberInstances() - 1 << " is done." );
+// 	}
+// 	else
+// 	{
+// 		// Save some W to make the numbering consistent
+// 		W = MatrixXd::Zero(1, 1);
 
-		// Save the subsampled canonical instance as the transformed
-		erg_mat = meshToMatrix(m_meshData.getObservedAt(can_number));
-		m_meshData.setTransformedAt(obs_number, m_meshData.getCanonical()) ;
-	}
+// 		// Save the subsampled canonical instance as the transformed
+// 		erg_mat = meshToMatrix(m_meshData.getObservedAt(can_number));
+// 		m_meshData.setTransformedAt(obs_number, m_meshData.getCanonical()) ;
+// 	}
 
-	// Save the W for the PCA
-	auto allW = m_meshData.getAllW();
+// 	// Save the W for the PCA
+// 	auto allW = m_meshData.getAllW();
 
-	while ( (int)allW.size() < (obs_number + 1))
-	{
-		MatrixXd A(1, 1);
-		A << 0;
-		allW.push_back(A);
-	}
+// 	while ( (int)allW.size() < (obs_number + 1))
+// 	{
+// 		MatrixXd A(1, 1);
+// 		A << 0;
+// 		allW.push_back(A);
+// 	}
 
-	allW[obs_number] = W;
+// 	allW[obs_number] = W;
 
-	m_meshData.setAllW(allW);
-}
+// 	m_meshData.setAllW(allW);
+// }
 
 
 bool ShapeRegistration::doPCA(int n_latent)
 {
-	if ((m_using_meshes && !m_meshData.getCpdDone() ) || ( !m_using_meshes && !m_cloudData.getCpdDone() ) )
+	if  ( !m_using_meshes && !m_cloudData.getCpdDone() ) 
 	{
 		ROS_INFO_STREAM( "Please calculate CPD first." );
 		return false;
@@ -414,22 +414,22 @@ bool ShapeRegistration::doPCA(int n_latent)
 	pca::ptr pca = pca::New();
 	pca::PCA_METHOD pcaMethod = pca::PCA_EM;
 
-	if (m_using_meshes)
-	{
-		if ( m_meshData.getCpdDone() )
-		{
-			pca->calculatePCA(m_meshData.getBigW(), n_latent, pcaMethod);
-			m_meshData.setPca(pca);
-			m_meshData.setPcaDone(true);
-			return true;
-		}
-		else
-		{
-			ROS_INFO( "Please load or calculate CPD first" );
-			return false;
-		}
-	}
-	else
+	// if (m_using_meshes)
+	// {
+	// 	if ( m_meshData.getCpdDone() )
+	// 	{
+	// 		pca->calculatePCA(m_meshData.getBigW(), n_latent, pcaMethod);
+	// 		m_meshData.setPca(pca);
+	// 		m_meshData.setPcaDone(true);
+	// 		return true;
+	// 	}
+	// 	else
+	// 	{
+	// 		ROS_INFO( "Please load or calculate CPD first" );
+	// 		return false;
+	// 	}
+	// }
+	// else
 	{
 		if ( m_cloudData.getCpdDone() )
 		{
@@ -457,7 +457,7 @@ bool ShapeRegistration::doPCA(int n_latent)
 // Make a big W matrix with the W from each instance in a single row
 void ShapeRegistration::buildBigW()
 {
-	if ((m_using_meshes && !m_meshData.getCpdDone() ) || ( !m_using_meshes && !m_cloudData.getCpdDone() ) )
+	if ( !m_using_meshes && !m_cloudData.getCpdDone() ) 
 	{
 		ROS_INFO_STREAM( "Please calculate CPD" );
 		return;
@@ -470,20 +470,20 @@ void ShapeRegistration::buildBigW()
 		int canonicalNumber;
 
 		// Meshes
-		if (m_using_meshes)
-		{
-			allW = m_meshData.getAllW();
+		// if (m_using_meshes)
+		// {
+		// 	allW = m_meshData.getAllW();
 
-			if (notCanonicalNumber == m_meshData.getCanonicalIdx())
-			{
-				notCanonicalNumber = 1;
-			}
+		// 	if (notCanonicalNumber == m_meshData.getCanonicalIdx())
+		// 	{
+		// 		notCanonicalNumber = 1;
+		// 	}
 
-			numberInstances = m_meshData.getNumberInstances();
-			canonicalNumber = m_meshData.getCanonicalIdx();
-		}
-		// Clouds
-		else
+		// 	numberInstances = m_meshData.getNumberInstances();
+		// 	canonicalNumber = m_meshData.getCanonicalIdx();
+		// }
+		// // Clouds
+		// else
 		{
 			allW = m_cloudData.getAllW();
 
@@ -519,11 +519,11 @@ void ShapeRegistration::buildBigW()
 			}
 		}
 
-		if (m_using_meshes)
-		{
-			m_meshData.setBigW( bigW );
-		}
-		else
+		// if (m_using_meshes)
+		// {
+		// 	m_meshData.setBigW( bigW );
+		// }
+		// else
 		{
 			m_cloudData.setBigW( bigW );
 		}
@@ -543,23 +543,23 @@ void ShapeRegistration::setSlider(int value)
 
 void ShapeRegistration::visualizePCA()
 {
-	if ((m_using_meshes && m_meshData.getPcaDone() == false) || (m_using_meshes == false && m_cloudData.getPcaDone() == false))
+	if (m_using_meshes == false && m_cloudData.getPcaDone() == false)
 	{
 		ROS_INFO_STREAM( "Please calculate the Shape Space (PCA) first" );
 	}
 	else
 	{
 		int notCanonicalNumber = 0;
-		if (notCanonicalNumber == m_meshData.getCanonicalIdx())
-		{
-			notCanonicalNumber = 1;
-		}
+		// if (notCanonicalNumber == m_meshData.getCanonicalIdx())
+		// {
+		// 	notCanonicalNumber = 1;
+		// }
 
 		pca::ptr calculatedPca;
 
-		if (m_using_meshes)
-			calculatedPca = m_meshData.getPca();
-		else
+		// if (m_using_meshes)
+		// 	calculatedPca = m_meshData.getPca();
+		// else
 			calculatedPca = m_cloudData.getPca();
 
 		// Build a vector to choose components to take in account
@@ -585,16 +585,16 @@ void ShapeRegistration::visualizePCA()
 		MatrixXd G;
 		MatrixXd tmpTransformed;
 
-		if (m_using_meshes)
-		{
-			canonical = m_meshData.m_canonicalMat;
-			G = m_meshData.getG();
-			tmpTransformed = canonical + G * transformW ;
+		// if (m_using_meshes)
+		// {
+		// 	canonical = m_meshData.m_canonicalMat;
+		// 	G = m_meshData.getG();
+		// 	tmpTransformed = canonical + G * transformW ;
 
-			m_meshData.m_transformedPCAMesh = matrixToMesh(tmpTransformed, m_meshData.getTransformedAt(notCanonicalNumber));
-			m_viewer.updateMeshesTesting();
-		}
-		else
+		// 	m_meshData.m_transformedPCAMesh = matrixToMesh(tmpTransformed, m_meshData.getTransformedAt(notCanonicalNumber));
+		// 	m_viewer.updateMeshesTesting();
+		// }
+		// else
 		{
 			canonical = m_cloudData.m_canonicalMat;
 			G = m_cloudData.getG();
@@ -628,7 +628,7 @@ MatrixXd ShapeRegistration::wFromClassW(int index, MatrixXd bigW)
 
 void ShapeRegistration::saveCPD()
 {
-	if ((m_using_meshes && m_meshData.getCpdDone() == false) || (m_using_meshes == false && m_cloudData.getCpdDone() == false) )
+	if (m_using_meshes == false && m_cloudData.getCpdDone() == false)
 	{
 		ROS_INFO_STREAM( "please calculate a cpd" );
 	}
@@ -639,18 +639,18 @@ void ShapeRegistration::saveCPD()
 		MatrixXd W;
 		ofstream saving;
 
-		if (m_using_meshes)
-		{
-			G = m_meshData.getG();
-			W = m_meshData.getBigW();
+		// if (m_using_meshes)
+		// {
+		// 	G = m_meshData.getG();
+		// 	W = m_meshData.getBigW();
 
-			// Saving canonical number
-			saving.open (m_category_filepath + "/meshCpdSaving.txt");
-			saving << m_meshData.getCanonicalIdx();
-			saving.close();
-			saving.open (m_category_filepath  + "/meshCpdSaving.txt", std::ofstream::out | std::ofstream::app);
-		}
-		else
+		// 	// Saving canonical number
+		// 	saving.open (m_category_filepath + "/meshCpdSaving.txt");
+		// 	saving << m_meshData.getCanonicalIdx();
+		// 	saving.close();
+		// 	saving.open (m_category_filepath  + "/meshCpdSaving.txt", std::ofstream::out | std::ofstream::app);
+		// }
+		// else
 		{
 			G = m_cloudData.getG();
 			W = m_cloudData.getBigW();
@@ -697,7 +697,7 @@ void ShapeRegistration::saveCPD()
 
 void ShapeRegistration::loadCPD()
 {
-	if ((m_using_meshes && m_meshData.getCpdDone() ) || (m_using_meshes == false && m_cloudData.getCpdDone() ) )
+	if (m_using_meshes == false && m_cloudData.getCpdDone() ) 
 	{
 		ROS_INFO_STREAM( "there is already a CPD" );   //TODO handle when there is already a CPD
 	}
@@ -713,11 +713,11 @@ void ShapeRegistration::loadCPD()
 		std::string line;
 		ifstream saving;
 
-		if (m_using_meshes)
-		{
-			saving.open(m_category_filepath + "/meshCpdSaving.txt");
-		}
-		else
+		// if (m_using_meshes)
+		// {
+		// 	saving.open(m_category_filepath + "/meshCpdSaving.txt");
+		// }
+		// else
 		{
 			saving.open(m_category_filepath + "/cloudCpdSaving.txt");
 		}
@@ -781,13 +781,13 @@ void ShapeRegistration::loadCPD()
 			saving.close();
 
 			// Save the loaded Informations to the category
-			if (m_using_meshes)
-			{
-				m_meshData.setCanonicalIdx(readCanonicalNumber);
-				m_meshData.setG(readG);
-				m_meshData.setBigW(readBigW);
-			}
-			else
+			// if (m_using_meshes)
+			// {
+			// 	m_meshData.setCanonicalIdx(readCanonicalNumber);
+			// 	m_meshData.setG(readG);
+			// 	m_meshData.setBigW(readBigW);
+			// }
+			// else
 			{
 				m_cloudData.setCanonicalIdx(readCanonicalNumber);
 				m_cloudData.setG(readG);
@@ -806,11 +806,11 @@ void ShapeRegistration::loadCPD()
 
 void ShapeRegistration::buildFromCPD()
 {
-	if (m_using_meshes)
-	{
-		buildMeshesFromCPD();
-	}
-	else
+	// if (m_using_meshes)
+	// {
+	// 	buildMeshesFromCPD();
+	// }
+	// else
 	{
 		buildCloudsFromCPD();
 	}
@@ -818,66 +818,66 @@ void ShapeRegistration::buildFromCPD()
 
 
 // Build the transformations fom loaded CPD data
-void ShapeRegistration::buildMeshesFromCPD()
-{
-	if (false) 
-		ROS_INFO_STREAM( "Please load the meshes belonging to this CPD and click again" ); 
-		// conditions when this will not work
-	else
-	{
-		// Subsample the canonical Mesh in the same way it happened when the CPD was calculated
-		vtkSmartPointer<vtkPolyData> subCan = vtkSmartPointer<vtkPolyData>::New();
-		subCan->DeepCopy(m_meshData.getCanonical() );
-		subCan = resolution(subCan, 1);
+// void ShapeRegistration::buildMeshesFromCPD()
+// {
+// 	if (false) 
+// 		ROS_INFO_STREAM( "Please load the meshes belonging to this CPD and click again" ); 
+// 		// conditions when this will not work
+// 	else
+// 	{
+// 		// Subsample the canonical Mesh in the same way it happened when the CPD was calculated
+// 		vtkSmartPointer<vtkPolyData> subCan = vtkSmartPointer<vtkPolyData>::New();
+// 		subCan->DeepCopy(m_meshData.getCanonical() );
+// 		subCan = resolution(subCan, 1);
 
-		while (subCan->GetNumberOfPoints() > m_meshData.getG().rows())
-		{
-			subCan = quadricClustering(subCan, 32);
-		}
+// 		while (subCan->GetNumberOfPoints() > m_meshData.getG().rows())
+// 		{
+// 			subCan = quadricClustering(subCan, 32);
+// 		}
 
-		m_meshData.m_canonicalMat = meshToMatrix(subCan);
+// 		m_meshData.m_canonicalMat = meshToMatrix(subCan);
 
-		std::vector<MatrixXd> allW;
+// 		std::vector<MatrixXd> allW;
 
-		// Run through all instances and calculate the transformations
-		for (int i = 0; i < (int)m_meshData.getNumberInstances(); i++)
-		{
-			MatrixXd transformedMatrix = m_meshData.m_canonicalMat;
+// 		// Run through all instances and calculate the transformations
+// 		for (int i = 0; i < (int)m_meshData.getNumberInstances(); i++)
+// 		{
+// 			MatrixXd transformedMatrix = m_meshData.m_canonicalMat;
 
-			if ( i != m_meshData.getCanonicalIdx())
-			{
-				MatrixXd Wi;
+// 			if ( i != m_meshData.getCanonicalIdx())
+// 			{
+// 				MatrixXd Wi;
 
-				if (i < m_meshData.getCanonicalIdx())
-					Wi = wFromClassW(i , m_meshData.getBigW());
+// 				if (i < m_meshData.getCanonicalIdx())
+// 					Wi = wFromClassW(i , m_meshData.getBigW());
 
-				if (i > m_meshData.getCanonicalIdx())
-					Wi = wFromClassW(i - 1, m_meshData.getBigW());
+// 				if (i > m_meshData.getCanonicalIdx())
+// 					Wi = wFromClassW(i - 1, m_meshData.getBigW());
 
-				transformedMatrix = m_meshData.m_canonicalMat + m_meshData.getG() * Wi;
-				m_meshData.setTransformedAt(i, matrixToMesh(transformedMatrix, subCan));
-				allW.push_back(Wi);
-			}
-			else
-			{
-				m_meshData.setTransformedAt(i, matrixToMesh(m_meshData.m_canonicalMat, subCan));
-				MatrixXd A(1, 1);
-				A << 0;
-				allW.push_back(A);
-			}
-		}
+// 				transformedMatrix = m_meshData.m_canonicalMat + m_meshData.getG() * Wi;
+// 				m_meshData.setTransformedAt(i, matrixToMesh(transformedMatrix, subCan));
+// 				allW.push_back(Wi);
+// 			}
+// 			else
+// 			{
+// 				m_meshData.setTransformedAt(i, matrixToMesh(m_meshData.m_canonicalMat, subCan));
+// 				MatrixXd A(1, 1);
+// 				A << 0;
+// 				allW.push_back(A);
+// 			}
+// 		}
 
-		m_meshData.setAllW(allW);
+// 		m_meshData.setAllW(allW);
 
-		// Save an instance for visualizing PCA after the CPD for visualization purposes
-		m_meshData.m_transformedPCAMesh = matrixToMesh(m_meshData.m_canonicalMat, subCan, 0, 0 , 255);
+// 		// Save an instance for visualizing PCA after the CPD for visualization purposes
+// 		m_meshData.m_transformedPCAMesh = matrixToMesh(m_meshData.m_canonicalMat, subCan, 0, 0 , 255);
 
-		m_meshData.setCpdDone(true);
-		m_viewer.updateTraMesh();
+// 		m_meshData.setCpdDone(true);
+// 		m_viewer.updateTraMesh();
 
-		ROS_INFO_STREAM( "CPD is loaded" );
-	}
-}
+// 		ROS_INFO_STREAM( "CPD is loaded" );
+// 	}
+// }
 
 
 void ShapeRegistration::buildCloudsFromCPD()
@@ -937,9 +937,9 @@ MatrixXd ShapeRegistration::pointsInLatentSpace()
 {
 	pca::ptr calculatedPca;
 
-	if (m_using_meshes)
-		calculatedPca = m_meshData.getPca();
-	else
+	// if (m_using_meshes)
+	// 	calculatedPca = m_meshData.getPca();
+	// else
 		calculatedPca = m_cloudData.getPca();
 
 	MatrixXd allLatent = calculatedPca->getX();
@@ -961,8 +961,8 @@ MatrixXd ShapeRegistration::pointsInLatentSpace()
 
 void ShapeRegistration::clear()
 {
-	MeshManager tmp;
-	m_meshData = tmp;
+	// MeshManager tmp;
+	// m_meshData = tmp;
 
 	CloudManager tmpCloud ;
 	m_cloudData = tmpCloud;
@@ -1031,7 +1031,7 @@ void ShapeRegistration::fitted(const MatrixXd& latent, const Eigen::Affine3d& tr
 {
 	MatrixXd aligned = getModelFromLatent(latent, trans);
 
-	if (m_using_meshes)
+	// if (m_using_meshes) //TODO: Check if this is correct
 	{
 		m_cloudData.setTransformedTesting(matrixToCloud(aligned));
 		m_viewer.updateCloudsTesting();
