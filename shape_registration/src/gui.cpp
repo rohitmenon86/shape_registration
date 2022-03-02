@@ -95,6 +95,8 @@ ShapeGui::ShapeGui (QWidget *parent) :
 
 	m_FilePathsMeshes.clear();
 	m_FilePathsClouds.clear();
+
+	m_shape_registration_service = m_nh.advertiseService("predict_shape", &ShapeGui::predictShapeCallback, this);
 }
 
 
@@ -887,6 +889,46 @@ void ShapeGui::pointCloudCallback(const sensor_msgs::PointCloud2ConstPtr& msg)
 void ShapeGui::fitToObserved()
 {
 	m_shape_reg->fitToObserved();
+}
+
+bool ShapeGui::predictShapeCallback(shape_registration_msgs::PredictShape::Request& req, shape_registration_msgs::PredictShape::Response& res)
+{
+	res.result_code  = -1;
+	res.result_text = "FAILURE";
+	ROS_WARN("Predict Shape Service called");
+	if ( m_nLatent > 0 )
+	{
+		if ( m_shape_reg->doPCA(m_nLatent) )
+		{
+			ui->latentBox1->setMaximum(m_nLatent - 1);
+			ui->latentBox2->setMaximum(m_nLatent - 1);
+
+			m_shape_reg->visualizePCA();
+			updateLatentPlot();
+		}
+	}
+	else
+	{
+		ROS_WARN("The number of latent variables must be bigger than zero");
+		res.result_code  = -100;
+		res.result_text = "FAILURE: The number of latent variables must be bigger than zero";
+		return false;
+	}
+	PointCloudT cloud;
+	pcl::fromROSMsg(req.observed_point_cloud, cloud);
+	PointCloudT::Ptr tmp_cloud( new PointCloudT(cloud) );
+	m_shape_reg->setTestingObserved(tmp_cloud);
+	m_shape_reg->fitToObserved();
+
+	MatrixXd offset = cloudToMatrix(m_shape_reg->getCloudDataHandle().getTransformedTesting()) - cloudToMatrix(m_shape_reg->getCloudDataHandle().getCanonical());
+	MatrixXd tmp = cloudToMatrix(m_shape_reg->getCloudDataHandle().getCanonical()) + 1.0 * offset;
+
+	PointCloudT::Ptr deformed = matrixToCloud(tmp);
+	
+	res.result_code  = 0;
+	res.result_text = "Success";
+	pcl::toROSMsg(*deformed, res.predicted_point_cloud);
+	return true;
 }
 
 
