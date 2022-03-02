@@ -61,6 +61,9 @@ public:
 	explicit ShapeGui (QWidget *parent = 0);
 	~ShapeGui ();
 
+	bool predictShapeCallback(shape_registration_msgs::PredictShape::Request&, shape_registration_msgs::PredictShape::Response&);
+
+
 private Q_SLOTS:
 	void frameChangePushed(int);
 
@@ -129,6 +132,12 @@ private:
 	int m_timerId = 0; // For resize events
 
 	ros::Subscriber m_sub_cloud;	// Subscriber of point cloud topic
+
+	ros::NodeHandle m_nh;
+
+	ros::ServiceServer m_shape_registration_service;
+
+
 
 	double m_lastTimeStamp;
 };
