@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   rqt_gui_cpp
   cpd
   sensor_msgs
+  shape_registration_msgs
 )
 
 
@@ -57,6 +58,7 @@ set(CMAKE_AUTORCC ON) # Resource files
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES shape_registration
+  CATKIN_DEPENDS shape_registration_msgs
 )
 
 include_directories(

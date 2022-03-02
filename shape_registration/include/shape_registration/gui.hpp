@@ -38,6 +38,8 @@
 #include <ros/ros.h>
 #include <ros/package.h>
 
+#include<shape_registration_msgs/PredictShape.h>
+
 #include <pcl_ros/point_cloud.h>
 
 #include <sensor_msgs/PointCloud2.h>

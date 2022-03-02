@@ -16,5 +16,6 @@
   <depend>rqt_gui_cpp</depend>
   <depend>cpd</depend>
   <depend>sensor_msgs</depend>
-  
+  <depend>shape_registration_msgs</depend>
+
 </package>
