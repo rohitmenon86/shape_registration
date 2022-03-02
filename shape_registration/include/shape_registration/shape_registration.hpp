@@ -215,6 +215,12 @@ public slots:
 	void plotCallback();                                  // Called by the solver thread as it updates
 	void modelCallback(double* XStar, double* pose);      // Called by the solver thread as it updates
 
+public:
+	CloudManager getCloudDataHandle()
+	{
+		return m_cloudData;
+	}
+
 private slots:
 	void fitted(const MatrixXd& XStar, const Eigen::Affine3d& trans);
 };
