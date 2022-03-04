@@ -18,7 +18,13 @@
 
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXd;
 
-
+enum SolverState
+{
+	SOLVER_NOT_INITIALISED = -1,
+	SOLVER_RUNNING = 0,
+	SOLVER_DONE_SUCCESS = 1,
+	SOLVER_DONE_NO_CONVERGENCE = 2
+};
 class solver_thread : public QThread
 {
 	Q_OBJECT
@@ -37,6 +43,12 @@ protected:
 
 private:
 	void solve();
+	void setSolverState(const SolverState& state)
+	{
+		m_mutex->lockForWrite();
+		m_solver_state = state;
+		m_mutex->unlock();
+	}
 
 	QReadWriteLock* m_mutex;
 
@@ -56,10 +68,36 @@ private:
 	const int m_cost_function = 2;
 	const bool m_opt_sigma = false;
 
+	SolverState m_solver_state;
+	ceres::Solver::Summary m_solver_summary;
+
 signals:
 	void fitted(const MatrixXd& XStar, const Eigen::Affine3d& trans);
 
 public slots:
 	void fit(MatrixXd observed_matrix, const MatrixXd& XStar, const Eigen::Affine3d& trans);
 	void halt();
+
+public:
+	SolverState getSolverState()
+	{
+		SolverState state;
+		m_mutex->lockForRead();
+		state = m_solver_state;
+		m_mutex->unlock();
+		return state;
+	}	
+	Eigen::Affine3d getLocalRigidTransform()
+	{
+		return m_local_rigid;
+	}
+	Eigen::MatrixXd getLatent()
+	{
+		return m_XStar;
+	}
+	ceres::Solver::Summary getSolverSummary()
+	{
+		return m_solver_summary;
+	}
+	
 };

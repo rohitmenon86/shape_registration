@@ -5,9 +5,10 @@
 #include <shape_registration/gui.hpp>
 #include "ui_surface_gui.h"
 
-#include <pcl/filters/filter.h>
+#include <pcl_ros/point_cloud.h>
 #include <pcl/conversions.h>
-
+#include <tf2_eigen/tf2_eigen.h>
+#include <pcl/filters/filter.h>
 
 using namespace categorical_registration;
 
@@ -97,6 +98,7 @@ ShapeGui::ShapeGui (QWidget *parent) :
 	m_FilePathsClouds.clear();
 
 	m_shape_registration_service = m_nh.advertiseService("predict_shape", &ShapeGui::predictShapeCallback, this);
+	m_pub_canonical_cloud        = m_nh.advertise<sensor_msgs::PointCloud2>("canonical_cloud", 10, true);
 }
 
 
@@ -319,6 +321,17 @@ void ShapeGui::loadCategoryPushed()
 		if (cpd_available.is_open())
 		{
 			loadCpd();
+			if(m_shape_reg->getCanonicalPCDIdx()> -1)
+			{
+				auto cloudptr = m_shape_reg->getCloudDataHandle().getCanonical();
+				colorCloud(cloudptr, 255, 0, 0);
+				sensor_msgs::PointCloud2 ros_pc2;
+				pcl::toROSMsg(*cloudptr, ros_pc2);
+				ros_pc2.header.frame_id = "base_link";
+				ros_pc2.header.stamp = ros::Time::now();
+				m_pub_canonical_cloud.publish(ros_pc2);
+
+			}
 		}
 
 		m_shape_reg->updateViewer();
@@ -891,11 +904,16 @@ void ShapeGui::fitToObserved()
 	m_shape_reg->fitToObserved();
 }
 
-bool ShapeGui::predictShapeCallback(shape_registration_msgs::PredictShape::Request& req, shape_registration_msgs::PredictShape::Response& res)
+/*bool ShapeGui::predictShapeCallback(shape_registration_msgs::PredictShape::Request& req, shape_registration_msgs::PredictShape::Response& res)
 {
 	res.result_code  = -1;
 	res.result_text = "FAILURE";
 	ROS_WARN("Predict Shape Service called");
+	if(m)
+	if ( m_nLatent < 3 )
+	{
+		m_nLatent = 3;
+	}
 	if ( m_nLatent > 0 )
 	{
 		if ( m_shape_reg->doPCA(m_nLatent) )
@@ -920,6 +938,19 @@ bool ShapeGui::predictShapeCallback(shape_registration_msgs::PredictShape::Reque
 	m_shape_reg->setTestingObserved(tmp_cloud);
 	m_shape_reg->fitToObserved();
 
+	SolverState  state = SOLVER_NOT_INITIALISED;
+	bool fitted_done = false;
+	do
+	{
+		ROS_WARN_STREAM_THROTTLE(0.2, "Solver State: "<<int(state)<<"\t Fitted: "<<fitted_done);
+		sleep(0.15);
+		state = m_shape_reg->getSolverState();
+		fitted_done = m_shape_reg->isFittedDone();
+	}
+	while(int(state)<1);
+
+	ROS_WARN_STREAM("Final Solver State: "<<int(state)<<"\t Fitted: "<<fitted_done);
+
 	MatrixXd offset = cloudToMatrix(m_shape_reg->getCloudDataHandle().getTransformedTesting()) - cloudToMatrix(m_shape_reg->getCloudDataHandle().getCanonical());
 	MatrixXd tmp = cloudToMatrix(m_shape_reg->getCloudDataHandle().getCanonical()) + 1.0 * offset;
 
@@ -928,11 +959,21 @@ bool ShapeGui::predictShapeCallback(shape_registration_msgs::PredictShape::Reque
 	res.result_code  = 0;
 	res.result_text = "Success";
 	pcl::toROSMsg(*deformed, res.predicted_point_cloud);
+	ROS_INFO_STREAM( "GUI: m_local_rigid_transform:\n" << m_shape_reg->getLocalRigidTransform().matrix());
+	geometry_msgs::TransformStamped t = tf2::eigenToTransform(m_shape_reg->getLocalRigidTransform());
+	res.rigid_local_transform = t.transform;
+	//m_shape_reg->resetFittedDone();
 	return true;
-}
+}*/
 
+bool ShapeGui::predictShapeCallback(shape_registration_msgs::PredictShape::Request& req, shape_registration_msgs::PredictShape::Response& res)
+{
+	return m_shape_reg->predictShape(m_nLatent, req, res);
+	updateLatentPlot();
+}
 
 void ShapeGui::cancelFitting()
 {
 	m_shape_reg->cancelFitting();
 }
+

@@ -22,6 +22,10 @@
 #include <sstream>
 #include <algorithm>
 
+// ROS
+#include<ros/ros.h>
+#include<shape_registration_msgs/PredictShape.h>
+
 typedef pcl::PointXYZRGBA PointT;
 typedef pcl::PointCloud<PointT> PointCloudT;
 
@@ -207,6 +211,10 @@ private:
 	int m_latentVariable2 = 0;
 	double m_latentVisualization2 = 0;
 
+	bool m_fitted_done = false;
+
+	Eigen::Affine3d m_local_rigid_transform; 
+
 signals:
 	void fit(MatrixXd observed_matrix, const MatrixXd& XStar, const Eigen::Affine3d& trans);
 	void haltOpt();
@@ -216,9 +224,28 @@ public slots:
 	void modelCallback(double* XStar, double* pose);      // Called by the solver thread as it updates
 
 public:
+	bool predictShape(const int&, shape_registration_msgs::PredictShape::Request&, shape_registration_msgs::PredictShape::Response&);
+
 	CloudManager getCloudDataHandle()
 	{
 		return m_cloudData;
+	}
+
+	Eigen::Affine3d getLocalRigidTransform()
+	{
+		return m_solver_thread->getLocalRigidTransform();
+	}
+	SolverState getSolverState()
+	{
+		return m_solver_thread->getSolverState();
+	}
+	bool isFittedDone()
+	{
+		return m_fitted_done;
+	}
+	bool resetFittedDone()
+	{
+		m_fitted_done = false;
 	}
 
 private slots:

@@ -17,5 +17,6 @@
   <depend>cpd</depend>
   <depend>sensor_msgs</depend>
   <depend>shape_registration_msgs</depend>
+  <depend>tf2</depend>
 
 </package>

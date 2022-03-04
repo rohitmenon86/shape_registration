@@ -5,6 +5,13 @@
 #include <shape_registration/shape_registration.hpp>
 
 #include <ros/package.h>
+#include <tf2_eigen/tf2_eigen.h>
+#include <pcl/conversions.h>
+#include <pcl/filters/filter.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/point_types.h>
+#include <pcl/PCLPointCloud2.h>
+#include <pcl_ros/transforms.h>
 
 using namespace categorical_registration;
 
@@ -1031,13 +1038,18 @@ void ShapeRegistration::fitted(const MatrixXd& latent, const Eigen::Affine3d& tr
 {
 	MatrixXd aligned = getModelFromLatent(latent, trans);
 
-	// if (m_using_meshes) //TODO: Check if this is correct
+	if (m_using_meshes) //TODO: Check if this is correct
 	{
 		m_cloudData.setTransformedTesting(matrixToCloud(aligned));
 		m_viewer.updateCloudsTesting();
 	}
-
-	ROS_INFO_STREAM( "Inference Results\n Latent:" << latent << "\n Local Rigid Trans:\n" << trans.matrix() );
+	if(m_solver_thread->getSolverState() == SOLVER_DONE_NO_CONVERGENCE || m_solver_thread->getSolverState() == SOLVER_DONE_SUCCESS)
+	{
+		ROS_INFO_STREAM( "Inference Results\n Latent:" << latent << "\n Local Rigid Trans:\n" << trans.matrix());
+		m_local_rigid_transform = trans;
+		ROS_INFO_STREAM( "SHAPE_REG: m_local_rigid_transform:\n" << m_local_rigid_transform.matrix());
+		m_fitted_done = true;
+	}
 }
 
 
@@ -1059,4 +1071,83 @@ void ShapeRegistration::modelCallback(double *latent, double *pose)
 
 	m_cloudData.setTransformedTesting(aligned);
 	m_viewer.updateCloudsTesting();
+}
+
+bool ShapeRegistration::predictShape(const int& nLatent, shape_registration_msgs::PredictShape::Request& req, shape_registration_msgs::PredictShape::Response& res)
+{
+	ROS_WARN("Predict Shape Service called");
+
+	res.result_code  = -1;
+	res.result_text = "FAILURE";
+
+	if(cpdDone() == false)
+	{
+		res.result_code  = -101;
+		res.result_text = "FAILURE: CPD Not Calculated";
+		return false;
+	}
+	
+	if (nLatent > 0 )
+	{
+		if (doPCA(nLatent) )
+		{
+			visualizePCA();
+		}
+	}
+	else
+	{
+		ROS_WARN("The number of latent variables must be bigger than zero");
+		res.result_code  = -102;
+		res.result_text = "FAILURE: The number of latent variables must be bigger than zero";
+		return false;
+	}
+	PointCloudT cloud;
+	pcl::fromROSMsg(req.observed_point_cloud, cloud);
+	PointCloudT::Ptr tmp_cloud( new PointCloudT(cloud) );
+	setTestingObserved(tmp_cloud);
+	fitToObserved();
+
+	SolverState  state = SOLVER_NOT_INITIALISED;
+	bool fitted_done = false;
+	do
+	{
+		ROS_WARN_STREAM_THROTTLE(0.2, "Solver State: "<<int(state));
+		sleep(0.15);
+		state = getSolverState();
+	}
+	while(int(state)<1);
+
+	ROS_WARN_STREAM("Final Solver State: "<<int(state));
+	ceres::Solver::Summary summary = m_solver_thread->getSolverSummary();
+	if(summary.IsSolutionUsable() || summary.final_cost < 0.001)
+	{
+		
+		auto aligned = getModelFromLatent(m_solver_thread->getLatent(), m_solver_thread->getLocalRigidTransform());
+
+		
+
+		m_cloudData.setTransformedTesting(matrixToCloud(aligned));
+		m_viewer.updateCloudsTesting();
+		
+		MatrixXd offset = cloudToMatrix(m_cloudData.getTransformedTesting()) - cloudToMatrix(m_cloudData.getCanonical());
+		MatrixXd tmp = cloudToMatrix(m_cloudData.getCanonical()) + 1.0 * offset;
+
+		PointCloudT::Ptr deformed = matrixToCloud(tmp);
+		//PointCloudT::Ptr deformed = m_cloudData.getTransformedTesting(); //matrixToCloud(tmp);
+		colorCloud(deformed, 0, 0, 255);
+
+		res.result_code  = 0;
+		res.result_text = "SUCCESS";
+		pcl::toROSMsg(*deformed, res.predicted_point_cloud);
+		ROS_INFO_STREAM( "GUI: m_local_rigid_transform:\n" << getLocalRigidTransform().matrix());
+		geometry_msgs::TransformStamped t = tf2::eigenToTransform(getLocalRigidTransform());
+		res.rigid_local_transform = t.transform;
+		res.predicted_point_cloud.header = req.observed_point_cloud.header;
+	}
+	else
+	{
+		res.result_code  = -100;
+		res.result_text = "FAILURE: Solution unusable or final cost too high";
+	}
+	return true;
 }

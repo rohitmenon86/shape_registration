@@ -124,6 +124,7 @@ void PCLViewer::updateCloudsTesting()
 		colorCloud(m_cloudData->getCanonical(), 255, 0, 0);
 		m_viewer->addPointCloud (m_cloudData->getCanonical(), "canonical_cloud");
 		m_viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, m_point_size, "canonical_cloud");
+		
 	}
 
 	if (m_show_observed)

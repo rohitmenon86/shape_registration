@@ -60,7 +60,7 @@ fit_iteration_callback* solver_thread::getCallback()
 void solver_thread::fit(MatrixXd observed_matrix, const MatrixXd& XStar, const Eigen::Affine3d& trans)
 {
 	ROS_DEBUG("Solver got signal");
-
+	setSolverState(SOLVER_NOT_INITIALISED);
 	if (!isRunning())
 	{
 		m_mutex->lockForRead();
@@ -88,7 +88,6 @@ void solver_thread::solve()
 {
 	// Make copies so we do not need to lock up when making assignments
 	m_mutex->lockForRead();
-
 	pca::ptr PCA = m_PCA->clone();
 	int q = PCA->getNumLatent();
 	MatrixXd XStar = m_XStar;
@@ -162,9 +161,9 @@ void solver_thread::solve()
 
 	// Run the solver
 	ROS_INFO_STREAM( "Xstar before: " << XStar << "\n") ;
-
+	setSolverState(SOLVER_RUNNING);
 	ceres::Solve(options, &problem, &summary);
-	ROS_INFO_STREAM(summary.BriefReport());
+	ROS_INFO_STREAM(summary.BriefReport()<<"\n Is Solution Usable: "<<summary.IsSolutionUsable());
 
 	// Retrieve the resulting pose
 	Eigen::Affine3d t( Eigen::Translation3d(Eigen::Vector3d(transformationArray[0], transformationArray[1], transformationArray[2])) );
@@ -175,16 +174,19 @@ void solver_thread::solve()
 
 	if (summary.termination_type == ceres::CONVERGENCE)
 	{
+		setSolverState(SOLVER_DONE_SUCCESS);
 		ROS_INFO("Fitting successful");
 	}
 	else
 	{
+		setSolverState(SOLVER_DONE_NO_CONVERGENCE);
 		ROS_WARN("Maximum number of iterations reached OR fitting failed");
 	}
 
 	m_mutex->lockForWrite();
 	m_XStar = XStar;
 	m_local_rigid = local_rigid;
+	m_solver_summary = summary;
 	m_mutex->unlock();
 
 	emit fitted(m_XStar, m_local_rigid);

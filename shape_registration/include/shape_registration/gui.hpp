@@ -38,7 +38,6 @@
 #include <ros/ros.h>
 #include <ros/package.h>
 
-#include<shape_registration_msgs/PredictShape.h>
 
 #include <pcl_ros/point_cloud.h>
 
@@ -137,7 +136,7 @@ private:
 
 	ros::ServiceServer m_shape_registration_service;
 
-
+	ros::Publisher m_pub_canonical_cloud;
 
 	double m_lastTimeStamp;
 };
