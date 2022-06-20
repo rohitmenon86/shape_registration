@@ -97,7 +97,10 @@ ShapeGui::ShapeGui (QWidget *parent) :
 	m_FilePathsMeshes.clear();
 	m_FilePathsClouds.clear();
 
-	m_shape_registration_service = m_nh.advertiseService("predict_shape", &ShapeGui::predictShapeCallback, this);
+	//m_shape_registration_service = m_nh.advertiseService("predict_shape", &ShapeGui::predictShapeCallback, this);
+	
+	m_shape_registration_service = m_nh.advertiseService("register_shape", &ShapeGui::registerShapeCallback, this);
+
 	m_pub_canonical_cloud        = m_nh.advertise<sensor_msgs::PointCloud2>("canonical_cloud", 10, true);
 }
 
@@ -968,7 +971,14 @@ void ShapeGui::fitToObserved()
 
 bool ShapeGui::predictShapeCallback(shape_registration_msgs::PredictShape::Request& req, shape_registration_msgs::PredictShape::Response& res)
 {
-	return m_shape_reg->predictShape(m_nLatent, req, res);
+	bool success = m_shape_reg->predictShape(m_nLatent, req, res);
+	updateLatentPlot();
+	return success;
+}
+
+bool ShapeGui::registerShapeCallback(shape_completion_bridge_msgs::RegisterShape::Request& req, shape_completion_bridge_msgs::RegisterShape::Response& res)
+{
+	//return m_shape_reg->predictShape(m_nLatent, req, res);
 	updateLatentPlot();
 }
 

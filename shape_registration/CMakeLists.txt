@@ -10,6 +10,8 @@ find_package(catkin REQUIRED COMPONENTS
   cpd
   sensor_msgs
   shape_registration_msgs
+  shape_completion_bridge_msgs
+  tf2
 )
 
 
@@ -50,6 +52,8 @@ find_package(PCL COMPONENTS common visualization REQUIRED)
 find_package(Ceres REQUIRED)
 
 #Set compiler settings
+add_definitions(-std=c++17)
+
 set(CMAKE_CXX_FLAGS "-std=c++17 -Wall ${CMAKE_CXX_FLAGS}")
 set(CMAKE_BUILD_TYPE "Release")
 set(CMAKE_AUTORCC ON) # Resource files
@@ -58,7 +62,7 @@ set(CMAKE_AUTORCC ON) # Resource files
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES shape_registration
-  CATKIN_DEPENDS shape_registration_msgs
+  CATKIN_DEPENDS shape_registration_msgs tf2
 )
 
 include_directories(
@@ -133,6 +137,15 @@ target_link_libraries(shape_registration_node
 add_executable(shape_gui_node src/main_gui.cpp src/gui.cpp ${MOC_SRCS_GUI} ${UI_HDRS_GUI})
 
 target_link_libraries(shape_gui_node
+    shape_registration
+    ${catkin_LIBRARIES}
+    ${QT_LIBRARIES}
+    ${QWT_LIBRARY}
+)
+
+add_executable(prediction_tester_node test/test_prediction_performance.cpp)
+
+target_link_libraries(prediction_tester_node
     shape_registration
     ${catkin_LIBRARIES}
     ${QT_LIBRARIES}

@@ -62,6 +62,8 @@ public:
 
 	bool predictShapeCallback(shape_registration_msgs::PredictShape::Request&, shape_registration_msgs::PredictShape::Response&);
 
+	bool registerShapeCallback(shape_completion_bridge_msgs::RegisterShape::Request&, shape_completion_bridge_msgs::RegisterShape::Response&);
+
 
 private Q_SLOTS:
 	void frameChangePushed(int);

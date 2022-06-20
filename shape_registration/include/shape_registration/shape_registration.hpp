@@ -25,6 +25,7 @@
 // ROS
 #include<ros/ros.h>
 #include<shape_registration_msgs/PredictShape.h>
+#include<shape_completion_bridge_msgs/RegisterShape.h>
 
 typedef pcl::PointXYZRGBA PointT;
 typedef pcl::PointCloud<PointT> PointCloudT;
@@ -225,6 +226,9 @@ public slots:
 
 public:
 	bool predictShape(const int&, shape_registration_msgs::PredictShape::Request&, shape_registration_msgs::PredictShape::Response&);
+
+	bool registerShape(const int&, shape_completion_bridge_msgs::RegisterShape::Request&, shape_completion_bridge_msgs::RegisterShape::Response&);
+
 
 	CloudManager getCloudDataHandle()
 	{

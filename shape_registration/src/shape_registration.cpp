@@ -1151,3 +1151,84 @@ bool ShapeRegistration::predictShape(const int& nLatent, shape_registration_msgs
 	}
 	return true;
 }
+
+bool ShapeRegistration::registerShape(const int& nLatent, shape_completion_bridge_msgs::RegisterShape::Request& req, shape_completion_bridge_msgs::RegisterShape::Response& res)
+{
+	ROS_WARN("Register Shape Service called");
+
+	res.result_code  = -1;
+	res.result_text = "FAILURE";
+
+	if(cpdDone() == false)
+	{
+		res.result_code  = -101;
+		res.result_text = "FAILURE: CPD Not Calculated";
+		return false;
+	}
+	
+	if (nLatent > 0 )
+	{
+		if (doPCA(nLatent) )
+		{
+			visualizePCA();
+		}
+	}
+	else
+	{
+		ROS_WARN("The number of latent variables must be bigger than zero");
+		res.result_code  = -102;
+		res.result_text = "FAILURE: The number of latent variables must be bigger than zero";
+		return false;
+	}
+	PointCloudT cloud;
+	pcl::fromROSMsg(req.observed_shape.cluster_pointcloud, cloud);
+	PointCloudT::Ptr tmp_cloud( new PointCloudT(cloud) );
+	setTestingObserved(tmp_cloud);
+	fitToObserved();
+
+	SolverState  state = SOLVER_NOT_INITIALISED;
+	bool fitted_done = false;
+	do
+	{
+		ROS_WARN_STREAM_THROTTLE(0.2, "Solver State: "<<int(state));
+		sleep(0.15);
+		state = getSolverState();
+	}
+	while(int(state)<1);
+
+	ROS_WARN_STREAM("Final Solver State: "<<int(state));
+	ceres::Solver::Summary summary = m_solver_thread->getSolverSummary();
+	if(summary.IsSolutionUsable() || summary.final_cost < 0.001)
+	{
+		
+		auto aligned = getModelFromLatent(m_solver_thread->getLatent(), m_solver_thread->getLocalRigidTransform());
+
+		
+
+		m_cloudData.setTransformedTesting(matrixToCloud(aligned));
+		m_viewer.updateCloudsTesting();
+		
+		MatrixXd offset = cloudToMatrix(m_cloudData.getTransformedTesting()) - cloudToMatrix(m_cloudData.getCanonical());
+		MatrixXd tmp = cloudToMatrix(m_cloudData.getCanonical()) + 1.0 * offset;
+
+		PointCloudT::Ptr deformed = matrixToCloud(tmp);
+		//PointCloudT::Ptr deformed = m_cloudData.getTransformedTesting(); //matrixToCloud(tmp);
+		colorCloud(deformed, 0, 0, 255);
+
+		res.result_code  = 0;
+		res.result_text = "SUCCESS";
+		pcl::toROSMsg(*deformed, res.registered_shape.predicted_pointcloud);
+		ROS_INFO_STREAM( "GUI: m_local_rigid_transform:\n" << getLocalRigidTransform().matrix());
+		geometry_msgs::TransformStamped t = tf2::eigenToTransform(getLocalRigidTransform());
+
+		res.registered_shape.rigid_local_transform = t.transform;
+		res.registered_shape.predicted_pointcloud.header = req.observed_shape.cluster_pointcloud.header;
+		res.registered_shape.observed_pointcloud = req.observed_shape.cluster_pointcloud;
+	}
+	else
+	{
+		res.result_code  = -100;
+		res.result_text = "FAILURE: Solution unusable or final cost too high";
+	}
+	return true;
+}
