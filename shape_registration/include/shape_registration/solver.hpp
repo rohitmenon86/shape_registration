@@ -56,10 +56,10 @@ private:
 	static const double beta;       // For calculating the G kernel matrix
 
 	// Parameters
-	const float m_costFunGain = 50000.0;
-	const float m_regLatentGain = 10.0;
-	const float m_regTranslationGain = 0.0;
-	const float m_regRotationGain = 0.0;
+	const float m_costFunGain = 50000;
+	const float m_regLatentGain = 5; 
+	const float m_regTranslationGain = 0; //0.0000199896;
+	const float m_regRotationGain = 5;
 
 	const bool m_rigidEnabled = true;
 };

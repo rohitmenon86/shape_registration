@@ -139,14 +139,13 @@ void solver_thread::solve()
 	ceres::Solver::Options options;
 	ceres::Solver::Summary summary;
 
-	options.minimizer_progress_to_stdout = true;
+	options.minimizer_progress_to_stdout = false;
 	options.update_state_every_iteration = true;
 	options.max_num_iterations = m_max_iterations;
 
 	// Set parameters for updating the GUI
 	m_callback->setParameters(XStar.data(), transformationArray);
 	options.callbacks.push_back(m_callback);
-
 	// Configure solver for the latent space registration
 	costFunction->AddParameterBlock(q);    // Latent Variables
 	costFunction->AddParameterBlock(7);    // Pose
@@ -159,6 +158,9 @@ void solver_thread::solve()
 	else
 		problem.AddResidualBlock(costFunction, NULL, XStar.data(), transformationArray );
 
+	problem.SetParameterLowerBound(transformationArray, 0, -0.03); problem.SetParameterUpperBound(transformationArray, 0, 0.03);
+	problem.SetParameterLowerBound(transformationArray, 1, -0.03); problem.SetParameterUpperBound(transformationArray, 1, 0.03);
+	problem.SetParameterLowerBound(transformationArray, 2, -0.045); problem.SetParameterUpperBound(transformationArray, 2, 0.045);
 	// Run the solver
 	ROS_INFO_STREAM( "Xstar before: " << XStar << "\n") ;
 	setSolverState(SOLVER_RUNNING);

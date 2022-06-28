@@ -12,6 +12,7 @@
 #include <pcl/point_types.h>
 #include <pcl/PCLPointCloud2.h>
 #include <pcl_ros/transforms.h>
+#include <pcl/filters/voxel_grid.h>
 
 using namespace categorical_registration;
 
@@ -1047,7 +1048,7 @@ void ShapeRegistration::fitted(const MatrixXd& latent, const Eigen::Affine3d& tr
 	{
 		ROS_INFO_STREAM( "Inference Results\n Latent:" << latent << "\n Local Rigid Trans:\n" << trans.matrix());
 		m_local_rigid_transform = trans;
-		ROS_INFO_STREAM( "SHAPE_REG: m_local_rigid_transform:\n" << m_local_rigid_transform.matrix());
+		ROS_DEBUG_STREAM( "SHAPE_REG: m_local_rigid_transform:\n" << m_local_rigid_transform.matrix());
 		m_fitted_done = true;
 	}
 }
@@ -1111,8 +1112,8 @@ bool ShapeRegistration::predictShape(const int& nLatent, shape_registration_msgs
 	bool fitted_done = false;
 	do
 	{
-		ROS_WARN_STREAM_THROTTLE(0.2, "Solver State: "<<int(state));
-		sleep(0.15);
+		ROS_WARN_STREAM_THROTTLE(1.0, "Solver State: "<<int(state));
+		sleep(0.5);
 		state = getSolverState();
 	}
 	while(int(state)<1);
@@ -1183,6 +1184,7 @@ bool ShapeRegistration::registerShape(const int& nLatent, shape_completion_bridg
 	PointCloudT cloud;
 	pcl::fromROSMsg(req.observed_shape.cluster_pointcloud, cloud);
 	PointCloudT::Ptr tmp_cloud( new PointCloudT(cloud) );
+	
 	setTestingObserved(tmp_cloud);
 	fitToObserved();
 
@@ -1190,8 +1192,8 @@ bool ShapeRegistration::registerShape(const int& nLatent, shape_completion_bridg
 	bool fitted_done = false;
 	do
 	{
-		ROS_WARN_STREAM_THROTTLE(0.2, "Solver State: "<<int(state));
-		sleep(0.15);
+		ROS_WARN_STREAM_THROTTLE(2.0, "Solver State: "<<int(state));
+		sleep(1.0);
 		state = getSolverState();
 	}
 	while(int(state)<1);
@@ -1218,12 +1220,13 @@ bool ShapeRegistration::registerShape(const int& nLatent, shape_completion_bridg
 		res.result_code  = 0;
 		res.result_text = "SUCCESS";
 		pcl::toROSMsg(*deformed, res.registered_shape.predicted_pointcloud);
-		ROS_INFO_STREAM( "GUI: m_local_rigid_transform:\n" << getLocalRigidTransform().matrix());
+		ROS_DEBUG_STREAM( "GUI: m_local_rigid_transform:\n" << getLocalRigidTransform().matrix());
 		geometry_msgs::TransformStamped t = tf2::eigenToTransform(getLocalRigidTransform());
 
 		res.registered_shape.rigid_local_transform = t.transform;
 		res.registered_shape.predicted_pointcloud.header = req.observed_shape.cluster_pointcloud.header;
 		res.registered_shape.observed_pointcloud = req.observed_shape.cluster_pointcloud;
+		res.registered_shape.cluster_centre = req.observed_shape.cluster_centre;
 	}
 	else
 	{

@@ -64,8 +64,8 @@ private:
 
 	// Config parameters
 	const float m_sigma = 0.05;
-	const int m_max_iterations = 40;
-	const int m_cost_function = 2;
+	const int m_max_iterations = 50;
+	const int m_cost_function = 0;
 	const bool m_opt_sigma = false;
 
 	SolverState m_solver_state;

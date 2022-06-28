@@ -978,8 +978,9 @@ bool ShapeGui::predictShapeCallback(shape_registration_msgs::PredictShape::Reque
 
 bool ShapeGui::registerShapeCallback(shape_completion_bridge_msgs::RegisterShape::Request& req, shape_completion_bridge_msgs::RegisterShape::Response& res)
 {
-	//return m_shape_reg->predictShape(m_nLatent, req, res);
+	bool success = m_shape_reg->registerShape(m_nLatent, req, res);
 	updateLatentPlot();
+	return success;
 }
 
 void ShapeGui::cancelFitting()
