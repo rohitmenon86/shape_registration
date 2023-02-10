@@ -979,7 +979,7 @@ bool ShapeGui::predictShapeCallback(shape_registration_msgs::PredictShape::Reque
 bool ShapeGui::registerShapeCallback(shape_completion_bridge_msgs::RegisterShape::Request& req, shape_completion_bridge_msgs::RegisterShape::Response& res)
 {
 	bool success = m_shape_reg->registerShape(m_nLatent, req, res);
-	updateLatentPlot();
+	//updateLatentPlot();
 	return success;
 }
 

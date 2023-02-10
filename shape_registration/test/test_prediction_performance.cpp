@@ -151,7 +151,7 @@ class PredictionTester
             std::vector<float> sqr_distances (1);
 
             tree_b.nearestKSearch (point, 1, indices, sqr_distances);
-            if (sqr_distances[0] > max_dist_a)
+            if (sqr_distances[0] > max_dist_a && sqr_distances[0] < 0.01)
             max_dist_a = sqr_distances[0];
         }
 
@@ -165,7 +165,7 @@ class PredictionTester
             std::vector<float> sqr_distances (1);
 
             tree_a.nearestKSearch (point, 1, indices, sqr_distances);
-            if (sqr_distances[0] > max_dist_b)
+            if (sqr_distances[0] > max_dist_b && sqr_distances[0] < 0.01)
             max_dist_b = sqr_distances[0];
         }
 

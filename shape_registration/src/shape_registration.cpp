@@ -1208,7 +1208,7 @@ bool ShapeRegistration::registerShape(const int& nLatent, shape_completion_bridg
 		
 
 		m_cloudData.setTransformedTesting(matrixToCloud(aligned));
-		m_viewer.updateCloudsTesting();
+		//m_viewer.updateCloudsTesting();
 		
 		MatrixXd offset = cloudToMatrix(m_cloudData.getTransformedTesting()) - cloudToMatrix(m_cloudData.getCanonical());
 		MatrixXd tmp = cloudToMatrix(m_cloudData.getCanonical()) + 1.0 * offset;
